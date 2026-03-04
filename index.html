@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales & Marketing Intelligence — hot cognition</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --orange: #F47B20;
+    --orange-dim: rgba(244,123,32,0.09);
+    --orange-mid: rgba(244,123,32,0.22);
+    --white: #ffffff;
+    --bg: #f5f4f1;
+    --rule: #e2e0db;
+    --gray: #888;
+    --ink: #1a1a1a;
+    --ink-light: #555;
+    --green: #1a7a42;
+    --green-bg: rgba(26,122,66,0.07);
+    --red: #c0292c;
+    --red-bg: rgba(192,41,44,0.07);
+    --blue: #1a5fa0;
+    --blue-bg: rgba(26,95,160,0.07);
+    --amber: #9a6800;
+    --amber-bg: rgba(154,104,0,0.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;cursor:none;}
+
+  /* CURSOR */
+  .cursor{position:fixed;width:10px;height:10px;background:var(--orange);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
+  .cursor-ring{position:fixed;width:34px;height:34px;border:1.5px solid var(--orange-mid);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 60px;display:flex;justify-content:space-between;align-items:center;background:rgba(245,244,241,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);}
+  .nav-left{display:flex;flex-direction:column;gap:2px;}
+  .nav-sub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.28em;color:var(--gray);text-transform:uppercase;}
+  .nav-cta{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:12px 26px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));transition:all .3s;}
+  .nav-cta:hover{background:var(--orange);transform:translateY(-2px);}
+
+  /* HERO */
+  .hero{min-height:100vh;display:flex;align-items:center;padding:120px 60px 80px;background:var(--white);position:relative;overflow:hidden;}
+  .hero-top-rule{position:absolute;top:0;left:0;right:0;height:4px;background:var(--orange);}
+  .hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);background-size:54px 54px;opacity:.5;mask-image:radial-gradient(ellipse 85% 85% at 50% 50%,black 0%,transparent 100%);}
+  .hero-inner{position:relative;max-width:1100px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:72px;align-items:center;}
+  .hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.38em;color:var(--orange);text-transform:uppercase;margin-bottom:22px;opacity:0;animation:fadeUp .8s ease .2s forwards;}
+  .hero-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,7vw,98px);line-height:.95;color:var(--black);margin-bottom:26px;opacity:0;animation:fadeUp .8s ease .4s forwards;}
+  .hero-headline em{font-style:normal;color:var(--orange);}
+  .hero-sub{font-size:17px;line-height:1.8;color:var(--ink-light);max-width:500px;margin-bottom:42px;opacity:0;animation:fadeUp .8s ease .6s forwards;}
+  .hero-sub strong{color:var(--black);font-weight:600;}
+  .hero-ctas{display:flex;gap:22px;align-items:center;opacity:0;animation:fadeUp .8s ease .8s forwards;}
+  .btn-primary{background:var(--orange);color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:16px 34px;text-decoration:none;display:inline-block;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));transition:all .3s;}
+  .btn-primary:hover{background:var(--black);transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,.14);}
+  .btn-ghost{color:var(--gray);font-size:13px;text-decoration:none;border-bottom:1px solid rgba(136,136,136,.35);padding-bottom:2px;transition:all .3s;}
+  .btn-ghost:hover{color:var(--black);border-color:var(--black);}
+
+  /* HERO PREVIEW */
+  .hero-right{opacity:0;animation:fadeLeft .9s ease 1s forwards;}
+  .dash-preview{background:var(--white);border:1px solid var(--rule);box-shadow:0 8px 40px rgba(0,0,0,.08);overflow:hidden;position:relative;}
+  .dash-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange);}
+  .dash-chrome{background:var(--bg);border-bottom:1px solid var(--rule);padding:10px 14px;display:flex;align-items:center;gap:6px;}
+  .dash-dot{width:8px;height:8px;border-radius:50%;}
+  .dash-dot:nth-child(1){background:#ff5f57;}.dash-dot:nth-child(2){background:#febc2e;}.dash-dot:nth-child(3){background:#28c840;}
+  .dash-title-bar{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray);letter-spacing:.08em;margin-left:8px;}
+  .dash-body{padding:18px;}
+  .dash-co{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;color:var(--orange);text-transform:uppercase;margin-bottom:12px;}
+  .dash-kpis{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:14px;}
+  .dash-kpi{background:var(--bg);padding:11px 13px;border-left:3px solid transparent;}
+  .dash-kpi.g{border-left-color:var(--green);}.dash-kpi.o{border-left-color:var(--orange);}.dash-kpi.r{border-left-color:var(--red);}.dash-kpi.b{border-left-color:var(--blue);}
+  .dash-kpi-n{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;}
+  .dash-kpi-n.g{color:var(--green);}.dash-kpi-n.o{color:var(--orange);}.dash-kpi-n.r{color:var(--red);}.dash-kpi-n.b{color:var(--blue);}
+  .dash-kpi-l{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-top:2px;}
+  .dash-bar-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.16em;color:var(--gray);text-transform:uppercase;margin-bottom:8px;}
+  .d-bars{display:flex;flex-direction:column;gap:6px;}
+  .d-bar-row{display:flex;align-items:center;gap:8px;}
+  .d-bar-name{font-size:10px;color:var(--ink-light);width:82px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .d-bar-track{flex:1;height:5px;background:var(--rule);overflow:hidden;}
+  .d-bar-fill{height:100%;transition:width 1.5s ease;}
+  .d-bar-val{font-family:'DM Mono',monospace;font-size:9px;width:28px;text-align:right;}
+
+  /* SHARED */
+  .eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.36em;color:var(--orange);text-transform:uppercase;margin-bottom:12px;}
+  .sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5vw,66px);line-height:1;color:var(--black);margin-bottom:12px;}
+  .sec-title em{font-style:normal;color:var(--orange);}
+  .sec-sub{font-size:16px;color:var(--ink-light);max-width:560px;line-height:1.75;margin-bottom:52px;}
+
+  /* ACTIONS SECTION */
+  .actions{padding:100px 60px;background:var(--black);border-top:4px solid var(--orange);}
+  .actions-inner{max-width:1100px;margin:0 auto;}
+  .actions .sec-title{color:var(--white);}
+  .actions .sec-sub{color:rgba(255,255,255,.5);}
+  .actions .eyebrow{color:var(--orange);}
+  .actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+  .action-card{background:#111;padding:36px;border-top:3px solid #222;transition:all .3s;position:relative;overflow:hidden;}
+  .action-card:hover{border-top-color:var(--orange);background:#161616;transform:translateY(-3px);}
+  .action-pri{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;color:var(--orange);text-transform:uppercase;margin-bottom:12px;}
+  .action-title{font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px;line-height:1.35;}
+  .action-body{font-size:13px;line-height:1.75;color:rgba(255,255,255,.45);margin-bottom:22px;}
+  .action-impact{display:inline-flex;align-items:baseline;gap:8px;background:rgba(244,123,32,.1);border:1px solid rgba(244,123,32,.22);padding:8px 14px;margin-bottom:20px;}
+  .action-impact-n{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange);line-height:1;}
+  .action-impact-l{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.14em;color:rgba(244,123,32,.65);text-transform:uppercase;}
+  .action-steps{display:flex;flex-direction:column;gap:7px;}
+  .action-step{font-size:12px;color:rgba(255,255,255,.4);line-height:1.55;padding-left:16px;position:relative;}
+  .action-step::before{content:'→';position:absolute;left:0;color:var(--orange);font-size:11px;}
+  .action-ghost-num{position:absolute;bottom:12px;right:18px;font-family:'Bebas Neue',sans-serif;font-size:88px;color:rgba(244,123,32,.04);line-height:1;pointer-events:none;}
+
+  /* MODULES */
+  .modules{padding:100px 60px;background:var(--bg);border-top:1px solid var(--rule);}
+  .modules-inner{max-width:1100px;margin:0 auto;}
+  .modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .mod-card{background:var(--white);border:1px solid var(--rule);box-shadow:0 2px 10px rgba(0,0,0,.04);overflow:hidden;transition:box-shadow .3s,transform .3s;}
+  .mod-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.09);transform:translateY(-2px);}
+  .mod-header{padding:22px 26px 16px;border-bottom:1px solid var(--rule);}
+  .mod-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--orange);text-transform:uppercase;margin-bottom:5px;}
+  .mod-title{font-size:15px;font-weight:700;color:var(--black);margin-bottom:4px;}
+  .mod-desc{font-size:12px;color:var(--gray);line-height:1.6;}
+  .mod-viz{padding:18px 26px;background:var(--bg);}
+  .mod-action{padding:13px 26px;border-top:1px solid var(--rule);background:var(--orange-dim);display:flex;gap:10px;align-items:flex-start;}
+  .mod-action-arr{color:var(--orange);font-size:13px;flex-shrink:0;margin-top:1px;}
+  .mod-action-text{font-size:12px;color:var(--ink);line-height:1.6;}
+  .mod-action-text strong{color:var(--orange);font-weight:600;}
+
+  /* VIZ PIECES */
+  .v-bars{display:flex;flex-direction:column;gap:7px;}
+  .v-bar-row{display:flex;align-items:center;gap:10px;}
+  .v-bar-label{font-size:11px;color:var(--ink-light);width:88px;flex-shrink:0;}
+  .v-bar-track{flex:1;height:7px;background:var(--rule);overflow:hidden;}
+  .v-bar-fill{height:100%;transition:width 1.8s ease;}
+  .v-bar-val{font-family:'DM Mono',monospace;font-size:10px;width:34px;text-align:right;}
+  .v-divider{height:1px;background:var(--rule);margin:8px 0;}
+
+  .funnel{display:flex;flex-direction:column;gap:4px;}
+  .f-row{display:flex;align-items:center;gap:10px;}
+  .f-label{font-size:11px;color:var(--ink-light);width:86px;flex-shrink:0;text-align:right;}
+  .f-bar{height:22px;background:var(--orange-dim);border-left:3px solid var(--orange);display:flex;align-items:center;padding:0 8px;transition:width 1.5s ease;min-width:48px;}
+  .f-bar.won{background:var(--green-bg);border-left-color:var(--green);}
+  .f-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange);}
+  .f-count.won{color:var(--green);}
+  .f-pct{font-size:10px;color:var(--gray);margin-left:auto;}
+
+  .c-list{display:flex;flex-direction:column;gap:4px;}
+  .c-row{background:var(--bg);padding:9px 11px;display:flex;justify-content:space-between;align-items:center;border-left:3px solid transparent;transition:border-color .25s;}
+  .c-row:hover{border-left-color:var(--orange);}
+  .c-name{font-size:12px;color:var(--ink);font-weight:500;}
+  .c-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray);margin-top:2px;}
+  .lift{font-family:'Bebas Neue',sans-serif;font-size:21px;padding:2px 7px;}
+  .lift.pos{color:var(--green);background:var(--green-bg);}
+  .lift.neg{color:var(--red);background:var(--red-bg);}
+  .lift.neu{color:var(--gray);background:var(--rule);}
+
+  .media-g{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+  .media-cell{background:var(--bg);padding:9px 11px;}
+  .media-ch{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-bottom:3px;}
+  .media-roas{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;}
+  .media-roas.hi{color:var(--green);}.media-roas.mi{color:var(--amber);}.media-roas.lo{color:var(--red);}
+  .media-sp{font-size:10px;color:var(--gray);margin-top:1px;}
+
+  .ev-list{display:flex;flex-direction:column;gap:4px;}
+  .ev-row{background:var(--bg);padding:10px 11px;border-left:3px solid var(--orange);}
+  .ev-row.dim{border-left-color:var(--rule);}
+  .ev-name{font-size:12px;color:var(--ink);font-weight:500;}
+  .ev-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray);margin-top:2px;}
+  .ev-pip{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--orange);margin-top:3px;}
+  .ev-pip.dim{color:var(--gray);}
+
+  .ct-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .ct-col-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--rule);}
+  .ct-col-label.has{color:var(--green);}
+  .ct-col-label.no{color:var(--red);}
+  .ct-list{display:flex;flex-direction:column;gap:4px;}
+  .ct-row{background:var(--bg);padding:8px 10px;display:flex;justify-content:space-between;align-items:center;}
+  .ct-name{font-size:11px;color:var(--ink);}
+  .ct-sub{font-size:9px;color:var(--gray);}
+  .ct-wr{font-family:'Bebas Neue',sans-serif;font-size:20px;}
+  .ct-wr.hi{color:var(--green);}.ct-wr.mi{color:var(--amber);}.ct-wr.lo{color:var(--red);}
+
+  /* CASE */
+  .case{padding:100px 60px;background:var(--white);border-top:1px solid var(--rule);}
+  .case-inner{max-width:1100px;margin:0 auto;}
+  .case-box{background:var(--bg);border:1px solid var(--rule);padding:52px;position:relative;overflow:hidden;}
+  .case-box::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--orange);}
+  .case-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.26em;color:var(--orange);text-transform:uppercase;margin-bottom:16px;}
+  .case-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,3.5vw,50px);line-height:1.05;color:var(--black);max-width:640px;margin-bottom:8px;}
+  .case-headline em{font-style:normal;color:var(--orange);}
+  .case-grid{display:grid;grid-template-columns:2fr 1fr;gap:48px;margin-top:32px;}
+  .case-body p{font-size:15px;line-height:1.8;color:var(--ink-light);margin-bottom:16px;}
+  .case-body p strong{color:var(--black);font-weight:600;}
+  .case-stats{display:flex;flex-direction:column;gap:2px;}
+  .cs{background:var(--white);padding:16px 18px;border-left:3px solid var(--orange);}
+  .cs-n{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);line-height:1;}
+  .cs-l{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.14em;color:var(--gray);text-transform:uppercase;margin-top:3px;}
+
+  /* DELIVERABLES */
+  .deliverables{padding:100px 60px;background:var(--bg);border-top:1px solid var(--rule);}
+  .deliverables-inner{max-width:1100px;margin:0 auto;}
+  .del-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:52px;}
+  .del-card{background:var(--white);padding:30px 24px;border:1px solid var(--rule);border-top:3px solid transparent;transition:all .3s;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+  .del-card:hover{border-top-color:var(--orange);transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.09);}
+  .del-icon{font-size:24px;margin-bottom:12px;}
+  .del-title{font-size:14px;font-weight:700;color:var(--black);margin-bottom:7px;}
+  .del-text{font-size:12px;color:var(--ink-light);line-height:1.65;}
+
+  /* CTA */
+  .final-cta{padding:120px 60px;text-align:center;background:var(--black);position:relative;overflow:hidden;border-top:4px solid var(--orange);}
+  .final-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 50% 50%,rgba(244,123,32,.07) 0%,transparent 70%);}
+  .final-cta-inner{position:relative;}
+  .final-cta h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,7vw,100px);line-height:.95;color:var(--white);margin-bottom:18px;}
+  .final-cta h2 em{font-style:normal;color:var(--orange);}
+  .final-cta p{font-size:17px;color:rgba(255,255,255,.45);max-width:420px;margin:0 auto 40px;line-height:1.7;}
+
+  footer{padding:30px 60px;border-top:1px solid rgba(255,255,255,.07);background:var(--black);display:flex;justify-content:space-between;align-items:center;}
+  .footer-note{font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.25);letter-spacing:.14em;}
+
+  /* REVEAL */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeLeft{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:translateX(0)}}
+
+  @media(max-width:960px){
+    nav,section,footer{padding-left:24px!important;padding-right:24px!important;}
+    .hero-inner,.actions-grid,.modules-grid,.case-grid,.del-grid,.ct-cols{grid-template-columns:1fr!important;}
+    .hero-right{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <div style="display:flex;align-items:baseline;gap:0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:22px;letter-spacing:-.02em;line-height:1;">
+  <span style="color:#0a0a0a;">hot</span><span style="color:#F47B20;margin-left:6px;">cognition</span>
+</div>
+    <div class="nav-sub">AI-Powered Sales &amp; Marketing Intelligence</div>
+  </div>
+  <a href="https://calendar.app.google/REe8ggvrksZ7chJx9" target="_blank" class="nav-cta">Book a Demo</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-top-rule"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">◆ Sales &amp; Marketing Intelligence — by hot cognition</div>
+      <h1 class="hero-headline">You can't scale<br>what you <em style="white-space:nowrap">can't see.</em><br>Now you can see<br>everything.</h1>
+      <p class="hero-sub">Which reps are closing. Which campaigns are converting. Which channels are moving pipeline. Which content is winning. <strong>All connected. All actionable. In 4–6 weeks.</strong></p>
+      <div class="hero-ctas">
+        <a href="https://calendar.app.google/REe8ggvrksZ7chJx9" target="_blank" class="btn-primary">See It With Your Data</a>
+        <a href="#actions" class="btn-ghost">See the actions it drives ↓</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="dash-preview">
+        <div class="dash-chrome">
+          <div class="dash-dot"></div><div class="dash-dot"></div><div class="dash-dot"></div>
+          <div class="dash-title-bar">Meridian Supply Co. · 24-Month Intelligence</div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-co">◆ CRM + Email + Media + Events</div>
+          <div class="dash-kpis">
+            <div class="dash-kpi g"><div class="dash-kpi-n g">61%</div><div class="dash-kpi-l">Current Win Rate</div></div>
+            <div class="dash-kpi o"><div class="dash-kpi-n o">$18.4M</div><div class="dash-kpi-l">Pipeline Value</div></div>
+            <div class="dash-kpi b"><div class="dash-kpi-n b">4.2×</div><div class="dash-kpi-l">Top Channel ROAS</div></div>
+            <div class="dash-kpi r"><div class="dash-kpi-n r">$6.1M</div><div class="dash-kpi-l">Recoverable Revenue</div></div>
+          </div>
+          <div class="dash-bar-label">◆ What's Moving the Needle</div>
+          <div class="d-bars">
+            <div class="d-bar-row"><div class="d-bar-name">Email Series 4</div><div class="d-bar-track"><div class="d-bar-fill" style="width:84%;background:var(--green);"></div></div><div class="d-bar-val" style="color:var(--green);">84%</div></div>
+            <div class="d-bar-row"><div class="d-bar-name">Rep: Sales Lead #1</div><div class="d-bar-track"><div class="d-bar-fill" style="width:78%;background:var(--green);"></div></div><div class="d-bar-val" style="color:var(--green);">78%</div></div>
+            <div class="d-bar-row"><div class="d-bar-name">Paid Search</div><div class="d-bar-track"><div class="d-bar-fill" style="width:71%;background:var(--blue);"></div></div><div class="d-bar-val" style="color:var(--blue);">71%</div></div>
+            <div class="d-bar-row"><div class="d-bar-name">Trade Show Q2</div><div class="d-bar-track"><div class="d-bar-fill" style="width:65%;background:var(--orange);"></div></div><div class="d-bar-val" style="color:var(--orange);">65%</div></div>
+            <div class="d-bar-row"><div class="d-bar-name">Product Content</div><div class="d-bar-track"><div class="d-bar-fill" style="width:59%;background:var(--amber);"></div></div><div class="d-bar-val" style="color:var(--amber);">59%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIORITY ACTIONS -->
+<section class="actions" id="actions">
+  <div class="actions-inner">
+    <div class="reveal">
+      <div class="eyebrow">◆ Priority Actions</div>
+      <h2 class="sec-title">Not just data.<br><em>What to do next.</em></h2>
+      <p class="sec-sub">Every insight surfaces a ranked action — with estimated revenue impact, a specific three-step playbook, and clear ownership. So your team doesn't just understand the picture. They act on it.</p>
+    </div>
+    <div class="actions-grid">
+
+      <div class="action-card reveal">
+        <div class="action-pri">◆ Priority 1 · People</div>
+        <div class="action-title">Address underperforming reps before another quarter passes</div>
+        <div class="action-body">One rep is generating 3× the loss rate of the team average — across hundreds of quotes. The problem is identifiable, traceable, and fixable. The cost of waiting isn't.</div>
+        <div class="action-impact"><div class="action-impact-n">$1.8M</div><div class="action-impact-l">Annual recovery potential</div></div>
+        <div class="action-steps">
+          <div class="action-step">Pull the rep's lost-deal breakdown by reason and deal size</div>
+          <div class="action-step">Initiate structured coaching with weekly pipeline review</div>
+          <div class="action-step">Set a 60-day win rate target with a clear reassignment trigger</div>
+        </div>
+        <div class="action-ghost-num">01</div>
+      </div>
+
+      <div class="action-card reveal">
+        <div class="action-pri">◆ Priority 2 · Pipeline</div>
+        <div class="action-title">Eliminate the never-touched quote problem immediately</div>
+        <div class="action-body">312 quotes were never followed up on. Win rate drops from 72% to 17% when first follow-up is delayed past 7 days. This isn't a market problem — it's a process gap costing real money every week it goes unfixed.</div>
+        <div class="action-impact"><div class="action-impact-n">$980K–$1.7M</div><div class="action-impact-l">Estimated recovery from follow-up cadence</div></div>
+        <div class="action-steps">
+          <div class="action-step">Flag every open quote with no activity past 3 days — assign to rep immediately</div>
+          <div class="action-step">Implement same-day or next-day first-touch as a hard process rule</div>
+          <div class="action-step">Automate 3 / 7 / 14-day follow-up sequences for quotes with no response</div>
+        </div>
+        <div class="action-ghost-num">02</div>
+      </div>
+
+      <div class="action-card reveal">
+        <div class="action-pri">◆ Priority 3 · Product Mix</div>
+        <div class="action-title">Shift rep focus toward high-margin, high-volume products</div>
+        <div class="action-body">Not all revenue is equal. Your optimal portfolio mix — high-margin products at scale, or the right balance of volume drivers and margin leaders — is measurable. Right now reps are closing what's easiest, not what's most profitable.</div>
+        <div class="action-impact"><div class="action-impact-n">+18%</div><div class="action-impact-l">Gross margin lift from mix optimization</div></div>
+        <div class="action-steps">
+          <div class="action-step">Map every SKU on a margin × volume matrix — identify your ideal quadrant</div>
+          <div class="action-step">Realign rep incentives to reward gross margin, not just revenue</div>
+          <div class="action-step">Set quarterly mix targets — track margin per closed deal, not just deal count</div>
+        </div>
+        <div class="action-ghost-num">03</div>
+      </div>
+
+      <div class="action-card reveal">
+        <div class="action-pri">◆ Priority 4 · Spend</div>
+        <div class="action-title">Reallocate media budget from channels below breakeven</div>
+        <div class="action-body">Display and programmatic are running below 1.4× ROAS while your top channels are underfunded. Every dollar shifted pays back at 6–7× instead of 0.9–1.4×. Budget arbitrage hiding in plain sight.</div>
+        <div class="action-impact"><div class="action-impact-n">+$180K/mo</div><div class="action-impact-l">Incremental revenue at current ROAS</div></div>
+        <div class="action-steps">
+          <div class="action-step">Pause display and programmatic spend immediately</div>
+          <div class="action-step">Shift $40K/mo to paid search and sponsored content</div>
+          <div class="action-step">Review ROAS by channel monthly — rebalance quarterly</div>
+        </div>
+        <div class="action-ghost-num">04</div>
+      </div>
+
+      <div class="action-card reveal">
+        <div class="action-pri">◆ Priority 5 · Pricing</div>
+        <div class="action-title">Build a pricing playbook for large deals</div>
+        <div class="action-body">Price-lost deals average 48% larger than no-response losses. Reps are losing big deals on price without a structured response — no discount tiers, no competitive comp sheets, no objection framework.</div>
+        <div class="action-impact"><div class="action-impact-n">$3.6M</div><div class="action-impact-l">Revenue lost to price objections</div></div>
+        <div class="action-steps">
+          <div class="action-step">Define discount authority tiers by deal size and rep level</div>
+          <div class="action-step">Build a competitive comparison sheet for top 5 objection scenarios</div>
+          <div class="action-step">Train the team — measure price-lost rate monthly</div>
+        </div>
+        <div class="action-ghost-num">05</div>
+      </div>
+
+      <div class="action-card reveal">
+        <div class="action-pri">◆ Priority 6 · Growth</div>
+        <div class="action-title">Double down on what's already working</div>
+        <div class="action-body">Your top reps, top channels, and content-supported products are significantly outperforming. The fastest path to growth isn't fixing everything — it's scaling what's already winning.</div>
+        <div class="action-impact"><div class="action-impact-n">Scale it</div><div class="action-impact-l">Amplify your existing wins</div></div>
+        <div class="action-steps">
+          <div class="action-step">Replicate Sales Lead #1's workflow and talk tracks with the bottom half of the team</div>
+          <div class="action-step">Expand Email Series 4 to more segments — your highest-lift asset</div>
+          <div class="action-step">Increase focus and stock depth on 54–64% win-rate products</div>
+        </div>
+        <div class="action-ghost-num">06</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section class="modules" id="modules">
+  <div class="modules-inner">
+    <div class="reveal">
+      <div class="eyebrow">◆ Intelligence Modules</div>
+      <h2 class="sec-title">Seven signals.<br><em>One picture.</em></h2>
+      <p class="sec-sub">Every module connects a driver to an outcome — and surfaces the action that follows. Built from your CRM, email platform, media accounts, and events data.</p>
+    </div>
+    <div class="modules-grid">
+
+      <!-- 01 REP -->
+      <div class="mod-card reveal">
+        <div class="mod-header">
+          <div class="mod-tag">01 · People</div>
+          <div class="mod-title">Rep Performance vs. Win Rate</div>
+          <div class="mod-desc">Who's closing — ranked against team average with lost-reason breakdown per rep.</div>
+        </div>
+        <div class="mod-viz">
+          <div class="v-bars">
+            <div class="v-bar-row"><div class="v-bar-label">Sales Lead #1</div><div class="v-bar-track"><div class="v-bar-fill" style="width:78%;background:var(--green);"></div></div><div class="v-bar-val" style="color:var(--green);">78%</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Sales Lead #2</div><div class="v-bar-track"><div class="v-bar-fill" style="width:64%;background:var(--green);"></div></div><div class="v-bar-val" style="color:var(--green);">64%</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Sales Lead #3</div><div class="v-bar-track"><div class="v-bar-fill" style="width:57%;background:var(--amber);"></div></div><div class="v-bar-val" style="color:var(--amber);">57%</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Sales Lead #4</div><div class="v-bar-track"><div class="v-bar-fill" style="width:44%;background:var(--amber);"></div></div><div class="v-bar-val" style="color:var(--amber);">44%</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Sales Lead #5</div><div class="v-bar-track"><div class="v-bar-fill" style="width:22%;background:var(--red);"></div></div><div class="v-bar-val" style="color:var(--red);">22%</div></div>
+            <div class="v-divider"></div>
+            <div class="v-bar-row"><div class="v-bar-label" style="color:var(--orange);font-weight:600;">Team Avg</div><div class="v-bar-track"><div class="v-bar-fill" style="width:53%;background:var(--orange);"></div></div><div class="v-bar-val" style="color:var(--orange);">53%</div></div>
+          </div>
+        </div>
+        <div class="mod-action"><div class="mod-action-arr">→</div><div class="mod-action-text"><strong>Action:</strong> Sales Lead #5's 22% win rate across 340 quotes is recoverable with coaching. Estimated <strong>$1.8M</strong> annual recovery.</div></div>
+      </div>
+
+      <!-- 02 FUNNEL -->
+      <div class="mod-card reveal">
+        <div class="mod-header">
+          <div class="mod-tag">02 · Pipeline</div>
+          <div class="mod-title">Pipeline Aging &amp; Never-Touched Quotes</div>
+          <div class="mod-desc">Which deals are aging past the point of recovery, which quotes were never followed up on, and where the real leak is hiding in your pipeline.</div>
+        </div>
+        <div class="mod-viz">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.16em;color:var(--gray);text-transform:uppercase;margin-bottom:4px;">◆ Quote Age at Time of Loss</div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">Never followed up</div><div class="v-bar-track"><div class="v-bar-fill" style="width:74%;background:var(--red);"></div></div><div class="v-bar-val" style="color:var(--red);">312 quotes</div></div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">21–45 days stale</div><div class="v-bar-track"><div class="v-bar-fill" style="width:56%;background:var(--amber);"></div></div><div class="v-bar-val" style="color:var(--amber);">238 quotes</div></div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">8–20 days stale</div><div class="v-bar-track"><div class="v-bar-fill" style="width:38%;background:var(--amber);"></div></div><div class="v-bar-val" style="color:var(--amber);">160 quotes</div></div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">46+ days stale</div><div class="v-bar-track"><div class="v-bar-fill" style="width:28%;background:var(--gray);"></div></div><div class="v-bar-val" style="color:var(--gray);">119 quotes</div></div>
+            <div class="v-divider"></div>
+            <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.16em;color:var(--gray);text-transform:uppercase;margin-bottom:4px;margin-top:4px;">◆ Win Rate by Days to First Follow-Up</div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">Same day</div><div class="v-bar-track"><div class="v-bar-fill" style="width:72%;background:var(--green);"></div></div><div class="v-bar-val" style="color:var(--green);">72%</div></div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">1–3 days</div><div class="v-bar-track"><div class="v-bar-fill" style="width:55%;background:var(--green);"></div></div><div class="v-bar-val" style="color:var(--green);">55%</div></div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">4–7 days</div><div class="v-bar-track"><div class="v-bar-fill" style="width:38%;background:var(--amber);"></div></div><div class="v-bar-val" style="color:var(--amber);">38%</div></div>
+            <div class="v-bar-row"><div class="v-bar-label" style="width:130px;">8+ days</div><div class="v-bar-track"><div class="v-bar-fill" style="width:17%;background:var(--red);"></div></div><div class="v-bar-val" style="color:var(--red);">17%</div></div>
+          </div>
+        </div>
+        <div class="mod-action"><div class="mod-action-arr">→</div><div class="mod-action-text"><strong>Action:</strong> 312 quotes were never followed up on. Win rate drops from 72% to 17% when first follow-up is delayed past 7 days. Same-day response is your single highest-leverage process change.</div></div>
+      </div>
+
+      <!-- 03 LOST REASON -->
+      <div class="mod-card reveal">
+        <div class="mod-header">
+          <div class="mod-tag">03 · Intelligence</div>
+          <div class="mod-title">Lost Revenue by Reason</div>
+          <div class="mod-desc">Why deals are lost — ranked by revenue impact. Separates fixable process failures from structural losses.</div>
+        </div>
+        <div class="mod-viz">
+          <div class="v-bars">
+            <div class="v-bar-row"><div class="v-bar-label">No Response</div><div class="v-bar-track"><div class="v-bar-fill" style="width:82%;background:var(--red);"></div></div><div class="v-bar-val" style="color:var(--red);">$4.9M</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Price</div><div class="v-bar-track"><div class="v-bar-fill" style="width:60%;background:var(--amber);"></div></div><div class="v-bar-val" style="color:var(--amber);">$3.6M</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Competitor</div><div class="v-bar-track"><div class="v-bar-fill" style="width:38%;background:var(--orange);"></div></div><div class="v-bar-val" style="color:var(--orange);">$2.3M</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Timing</div><div class="v-bar-track"><div class="v-bar-fill" style="width:22%;background:var(--blue);"></div></div><div class="v-bar-val" style="color:var(--blue);">$1.4M</div></div>
+            <div class="v-bar-row"><div class="v-bar-label">Other</div><div class="v-bar-track"><div class="v-bar-fill" style="width:14%;background:var(--rule);"></div></div><div class="v-bar-val" style="color:var(--gray);">$0.9M</div></div>
+          </div>
+        </div>
+        <div class="mod-action"><div class="mod-action-arr">→</div><div class="mod-action-text"><strong>Action:</strong> "No Response" at $4.9M is a process failure — not a market problem. A 3-7-14 follow-up cadence recovers <strong>20–35%</strong> reliably.</div></div>
+      </div>
+
+      <!-- 04 EMAIL -->
+      <div class="mod-card reveal">
+        <div class="mod-header">
+          <div class="mod-tag">04 · Campaigns</div>
+          <div class="mod-title">Email Campaign Impact on Pipeline</div>
+          <div class="mod-desc">Which sequences influence win rate — tied to click-to-quote and downstream close rate.</div>
+        </div>
+        <div class="mod-viz">
+          <div class="c-list">
+            <div class="c-row"><div><div class="c-name">Q2 Product Launch Series</div><div class="c-sub">6-email sequence · April</div></div><div class="lift pos">+31%</div></div>
+            <div class="c-row"><div><div class="c-name">New Product Alert</div><div class="c-sub">Existing customers · Aug</div></div><div class="lift pos">+22%</div></div>
+            <div class="c-row"><div><div class="c-name">Re-engagement Drip</div><div class="c-sub">Cold leads · Ongoing</div></div><div class="lift pos">+18%</div></div>
+            <div class="c-row"><div><div class="c-name">Monthly Newsletter</div><div class="c-sub">All contacts · Monthly</div></div><div class="lift neu">+3%</div></div>
+            <div class="c-row"><div><div class="c-name">Promo Blast — Jan</div><div class="c-sub">One-time broadcast</div></div><div class="lift neg">−4%</div></div>
+          </div>
+        </div>
+        <div class="mod-action"><div class="mod-action-arr">→</div><div class="mod-action-text"><strong>Action:</strong> Expand the Q2 Launch Series format to more products — your highest-lift asset. Batch-and-blast suppresses close rates. Retire or redesign.</div></div>
+      </div>
+
+      <!-- 05 MEDIA -->
+      <div class="mod-card reveal">
+        <div class="mod-header">
+          <div class="mod-tag">05 · Spend</div>
+          <div class="mod-title">Media Spend vs. Revenue Lift</div>
+          <div class="mod-desc">ROAS by channel — connected to closed revenue, not just clicks or impressions.</div>
+        </div>
+        <div class="mod-viz">
+          <div class="media-g">
+            <div class="media-cell"><div class="media-ch">Paid Search</div><div class="media-roas hi">6.8×</div><div class="media-sp">$42K/mo</div></div>
+            <div class="media-cell"><div class="media-ch">Sponsored Content</div><div class="media-roas hi">5.2×</div><div class="media-sp">$14K/mo</div></div>
+            <div class="media-cell"><div class="media-ch">Retargeting</div><div class="media-roas mi">4.1×</div><div class="media-sp">$9K/mo</div></div>
+            <div class="media-cell"><div class="media-ch">Social Ads</div><div class="media-roas mi">3.1×</div><div class="media-sp">$28K/mo</div></div>
+            <div class="media-cell"><div class="media-ch">Display</div><div class="media-roas lo">1.4×</div><div class="media-sp">$18K/mo</div></div>
+            <div class="media-cell"><div class="media-ch">Programmatic</div><div class="media-roas lo">0.9×</div><div class="media-sp">$22K/mo</div></div>
+          </div>
+        </div>
+        <div class="mod-action"><div class="mod-action-arr">→</div><div class="mod-action-text"><strong>Action:</strong> Shift $40K/mo from Display + Programmatic to Paid Search. At current ROAS that's an estimated <strong>+$180K/mo</strong> in incremental revenue.</div></div>
+      </div>
+
+      <!-- 06 EVENTS -->
+      <div class="mod-card reveal">
+        <div class="mod-header">
+          <div class="mod-tag">06 · Events</div>
+          <div class="mod-title">Event Impact on Pipeline</div>
+          <div class="mod-desc">How trade shows, webinars, and sponsorships translate to pipeline and closed deals — 90 days post-event.</div>
+        </div>
+        <div class="mod-viz">
+          <div class="ev-list">
+            <div class="ev-row"><div class="ev-name">Industry Trade Show — Q2</div><div class="ev-meta">In-person · 3 days · $68K cost · 27× ROI</div><div class="ev-pip">$1.84M pipeline</div></div>
+            <div class="ev-row"><div class="ev-name">Regional Sales Summit</div><div class="ev-meta">In-person · 1 day · $22K cost · 28× ROI</div><div class="ev-pip">$610K pipeline</div></div>
+            <div class="ev-row"><div class="ev-name">Virtual Product Webinar</div><div class="ev-meta">Online · 60 min · $4K cost · 85× ROI</div><div class="ev-pip">$340K pipeline</div></div>
+            <div class="ev-row dim"><div class="ev-name">Sponsored Conference</div><div class="ev-meta">Sponsorship only · $35K cost · 5× ROI</div><div class="ev-pip dim">$180K pipeline</div></div>
+          </div>
+        </div>
+        <div class="mod-action"><div class="mod-action-arr">→</div><div class="mod-action-text"><strong>Action:</strong> Owned events outperform passive sponsorships 5–6×. Replace the sponsored conference with a second owned regional summit.</div></div>
+      </div>
+
+      <!-- 07 CONTENT - FULL WIDTH -->
+      <div class="mod-card reveal" style="grid-column:1/-1;">
+        <div class="mod-header">
+          <div class="mod-tag">07 · Product Mix</div>
+          <div class="mod-title">Margin Optimization &amp; Product Mix Analysis</div>
+          <div class="mod-desc">Identifying your optimal revenue mix — high-margin high-volume winners, and the right balance between volume-driven and margin-driven products across your portfolio.</div>
+        </div>
+        <div class="mod-viz">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+            <div>
+              <div class="ct-col-label has" style="border-color:var(--green);">◆ Ideal — High Margin · High Volume</div>
+              <div class="ct-list">
+                <div class="ct-row" style="border-left:3px solid var(--green);"><div><div class="ct-name">SKU A</div><div class="ct-sub">42% margin · $2.1M revenue</div></div><div class="ct-wr hi">Scale</div></div>
+                <div class="ct-row" style="border-left:3px solid var(--green);"><div><div class="ct-name">SKU B</div><div class="ct-sub">38% margin · $1.8M revenue</div></div><div class="ct-wr hi">Scale</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="ct-col-label" style="color:var(--amber);border-bottom:1px solid var(--rule);padding-bottom:6px;">◆ Mixed — Optimize the Balance</div>
+              <div class="ct-list">
+                <div class="ct-row" style="border-left:3px solid var(--amber);"><div><div class="ct-name">SKU C</div><div class="ct-sub">28% margin · $3.4M revenue</div></div><div class="ct-wr mi">Volume</div></div>
+                <div class="ct-row" style="border-left:3px solid var(--amber);"><div><div class="ct-name">SKU D</div><div class="ct-sub">51% margin · $480K revenue</div></div><div class="ct-wr mi">Grow</div></div>
+                <div class="ct-row" style="border-left:3px solid var(--amber);"><div><div class="ct-name">SKU E</div><div class="ct-sub">33% margin · $1.2M revenue</div></div><div class="ct-wr mi">Hold</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="ct-col-label no">◆ Caution — Low Margin · Low Volume</div>
+              <div class="ct-list">
+                <div class="ct-row" style="border-left:3px solid var(--red);"><div><div class="ct-name">SKU F</div><div class="ct-sub">14% margin · $310K revenue</div></div><div class="ct-wr lo">Review</div></div>
+                <div class="ct-row" style="border-left:3px solid var(--red);"><div><div class="ct-name">SKU G</div><div class="ct-sub">11% margin · $190K revenue</div></div><div class="ct-wr lo">Exit?</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:12px 14px;background:var(--white);border:1px solid var(--rule);border-left:3px solid var(--orange);">
+            <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;color:var(--orange);text-transform:uppercase;margin-bottom:6px;">◆ Portfolio Opportunity Gap</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+              <div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green);line-height:1;">$3.9M</div><div style="font-size:10px;color:var(--gray);">Revenue from ideal mix SKUs</div></div>
+              <div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--amber);line-height:1;">+18%</div><div style="font-size:10px;color:var(--gray);">Margin lift if mix is optimized</div></div>
+              <div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red);line-height:1;">$500K</div><div style="font-size:10px;color:var(--gray);">Revenue in sub-15% margin SKUs</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mod-action"><div class="mod-action-arr">→</div><div class="mod-action-text"><strong>Action:</strong> SKUs C and D represent the key optimization — SKU C drives volume at thin margins while SKU D has strong margin but limited scale. <strong>Growing SKU D by 30% while holding SKU C flat delivers more gross profit than growing SKU C by 50%.</strong> Review SKUs F and G for exit or repricing.</div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDY -->
+<section class="case">
+  <div class="case-inner">
+    <div class="reveal"><div class="eyebrow">◆ Illustrative Case Study</div></div>
+    <div class="case-box reveal">
+      <div class="case-tag">B2B Supply Co. · 24-Month Analysis · CRM + Email + Media + Events</div>
+      <h2 class="case-headline">They knew revenue was leaking.<br>They didn't know <em>exactly where — or what to do — until now.</em></h2>
+      <div class="case-grid">
+        <div class="case-body">
+          <p>Meridian Supply Co. had a strong product line, an active sales team, and a full marketing calendar. Win rates had been declining for two quarters and nobody could agree on why — marketing said leads were strong, sales said they were cold, finance said the numbers didn't add up.</p>
+          <p>We connected their CRM, email platform, ad accounts, and events data into a single intelligence layer. <strong>Within 4–6 weeks, three root causes were identified and prioritized.</strong> One rep was responsible for the majority of recoverable losses. Two high-volume products had zero content support. Their best-performing media channel was underfunded while a sub-1× ROAS campaign ran untouched for six months.</p>
+          <p>Each finding came with a specific, ranked action and revenue impact estimate. The first action alone paid for the engagement before the quarter ended.</p>
+        </div>
+        <div class="case-stats">
+          <div class="cs"><div class="cs-n">$6.1M</div><div class="cs-l">Recoverable revenue identified</div></div>
+          <div class="cs"><div class="cs-n">3</div><div class="cs-l">Root causes · 4–6 weeks to surface</div></div>
+          <div class="cs"><div class="cs-n">+19%</div><div class="cs-l">Win rate lift in 90 days</div></div>
+          <div class="cs"><div class="cs-n">1 quarter</div><div class="cs-l">Payback on full engagement</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section class="deliverables">
+  <div class="deliverables-inner">
+    <div class="reveal">
+      <div class="eyebrow">◆ What You Get</div>
+      <h2 class="sec-title">Connected.<br><em>Actionable. Fast.</em></h2>
+      <p class="sec-sub">We connect your existing data in 4–6 weeks and deliver a live intelligence layer — plus a prioritized action plan with revenue impact estimates for every finding.</p>
+    </div>
+    <div class="del-grid">
+      <div class="del-card reveal"><div class="del-icon">🔗</div><div class="del-title">Data Integration</div><div class="del-text">CRM, email, ad accounts, and events — unified. We handle the connection and cleaning. No new tools required.</div></div>
+      <div class="del-card reveal"><div class="del-icon">📡</div><div class="del-title">Live Intelligence Dashboard</div><div class="del-text">Seven connected modules updated in real time — accessible to your CEO, CMO, and sales leadership from day one.</div></div>
+      <div class="del-card reveal"><div class="del-icon">🎯</div><div class="del-title">Priority Action Report</div><div class="del-text">Ranked actions with specific revenue impact estimates, three-step playbooks, and ownership — not just charts.</div></div>
+      <div class="del-card reveal"><div class="del-icon">🤝</div><div class="del-title">Strategic Coaching</div><div class="del-text">We work alongside your team to align stakeholders and activate the plan. Human intelligence, AI-accelerated.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="final-cta" id="book">
+  <div class="final-cta-inner reveal">
+    <div class="eyebrow" style="text-align:center;">◆ Ready to see what's moving the needle</div>
+    <h2>See it with<br><em>your data.</em></h2>
+    <p>We'll show you what's working, what isn't, and exactly what to do about it — using your actual data, in 4–6 weeks.</p>
+    <a href="https://calendar.app.google/REe8ggvrksZ7chJx9" target="_blank" class="btn-primary" style="font-size:13px;padding:18px 48px;">Book a Discovery Call</a>
+    <div style="margin-top:20px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.3);text-transform:uppercase;">hotcognition.ai &nbsp;·&nbsp; 30 minutes &nbsp;·&nbsp; No obligation</div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div style="display:flex;align-items:baseline;gap:0;font-family:'DM Sans',sans-serif;font-weight:700;font-size:17px;letter-spacing:-.02em;line-height:1;">
+  <span style="color:#ffffff;">hot</span><span style="color:#F47B20;margin-left:5px;">cognition</span>
+</div>
+    <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.28);letter-spacing:.18em;margin-top:4px;">SALES &amp; MARKETING INTELLIGENCE</div>
+  </div>
+  <div class="footer-note">hotcognition.ai &nbsp;·&nbsp; © 2026</div>
+</footer>
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.action-card,.mod-card,.del-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.width='18px';cursor.style.height='18px';ring.style.width='52px';ring.style.height='52px';});
+  el.addEventListener('mouseleave',()=>{cursor.style.width='10px';cursor.style.height='10px';ring.style.width='34px';ring.style.height='34px';});
+});
+
+// SCROLL REVEAL
+const ro=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');ro.unobserve(x.target);}});},{threshold:.07});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// ANIMATE BARS
+const bo=new IntersectionObserver(e=>{
+  e.forEach(x=>{
+    if(x.isIntersecting){
+      const w=x.target.style.width;
+      x.target.style.width='0';
+      setTimeout(()=>{x.target.style.width=w;},60);
+      bo.unobserve(x.target);
+    }
+  });
+},{threshold:.1});
+document.querySelectorAll('.bar-fill').forEach(el=>bo.observe(el));
+</script>
+</html>
